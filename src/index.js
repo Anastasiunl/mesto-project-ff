@@ -1,5 +1,5 @@
 import './pages/index.css'
-import { initialCards } from './scripts/cards.js'
+import { initialCards } from './components/cards.js'
 import { createCard } from './components/card.js'
 import { openPopup, closePopup, closePopupByOverlay  } from './components/modal'
 
@@ -18,24 +18,25 @@ const profileDesc =  document.querySelector('.profile__description')
 const newCardForm = popupTypeNewCard.querySelector('.popup__form')
 const newCardNameInput = newCardForm.querySelector('.popup__input_type_card-name')
 const newCardUrlInput = newCardForm.querySelector('.popup__input_type_url')
-
+const popupTypeImage = document.querySelector('.popup_type_image')
+const popupImage = popupTypeImage.querySelector('.popup__image')
+const popupCaptionTypeImage = popupTypeImage.querySelector('.popup__caption')
 
 initialCards.forEach(card => {
   placeList.prepend(createCard(card, openPopupImage))
 })
 
-
-profileEditBtn.addEventListener('click', () => openPopup(popupTypeEdit))
+profileEditBtn.addEventListener('click', () => {
+  openPopup(popupTypeEdit) 
+  editFormNameInput.value = profileTitle.textContent
+  editFormDescInput.value = profileDesc.textContent
+} )
 profileAddBtn.addEventListener('click', () => openPopup(popupTypeNewCard))
 
 function openPopupImage(name, link) {
-  const popupTypeImage = document.querySelector('.popup_type_image')
-  const popupImage = popupTypeImage.querySelector('.popup__image')
-  const popupCaption = popupTypeImage.querySelector('.popup__caption')
-
   popupImage.src = link
   popupImage.alt = name
-  popupCaption.textContent = name
+  popupCaptionTypeImage.textContent = name
 
   openPopup(popupTypeImage)
 }
@@ -46,7 +47,6 @@ closePopupBtns.forEach(buttons => {
     closePopup(popup)
   })
 })
-
 
 function editFormSubmit(event){
   event.preventDefault()
@@ -71,9 +71,9 @@ function newCardFormSubmit(event){
     name: nameValue,
     link: urlValue
   }
- placeList.prepend(createCard(card))
+ placeList.prepend(createCard(card, openPopupImage))
  closePopup(popupTypeNewCard)
- newCardForm.replaceWith()
+ newCardForm.reset()
 }
 newCardForm.addEventListener('submit', newCardFormSubmit)
 
@@ -84,6 +84,5 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }) 
 })
-
 
 closePopupByOverlay(popups)
