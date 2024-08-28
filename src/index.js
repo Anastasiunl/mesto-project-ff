@@ -1,7 +1,12 @@
 import './pages/index.css'
-import { initialCards } from './scripts/cards.js'
+import { initialCards } from './components/cards.js'
 import { createCard } from './components/card.js'
 import { openPopup, closePopup, closePopupByOverlay  } from './components/modal'
+import { deleteCard } from './components/api.js'
+import { enableValidation, clearValidation } from './components/validation.js'
+import { updateAvatar, getProfileInfo, editProfileInfo, getInitialCards, addCard
+} from './components/api.js'
+
 
 const placeList = document.querySelector('.places__list')
 const popupTypeEdit = document.querySelector('.popup_type_edit')
@@ -18,24 +23,42 @@ const profileDesc =  document.querySelector('.profile__description')
 const newCardForm = popupTypeNewCard.querySelector('.popup__form')
 const newCardNameInput = newCardForm.querySelector('.popup__input_type_card-name')
 const newCardUrlInput = newCardForm.querySelector('.popup__input_type_url')
+const popupTypeImage = document.querySelector('.popup_type_image')
+const popupImage = popupTypeImage.querySelector('.popup__image')
+const popupCaptionTypeImage = popupTypeImage.querySelector('.popup__caption')
+const profileAvatar = document.querySelector('.profile__image')
+let userId;
+const popupTypeAvatar = document.querySelector('.popup_type_avatar')
+const avatarForm = popupTypeAvatar.querySelector('.popup__form')
+const avatarFormInput = avatarForm.querySelector('.popup__input_type_url')
 
 
-initialCards.forEach(card => {
-  placeList.prepend(createCard(card, openPopupImage))
+Promise.all([getInitialCards(), getProfileInfo()])
+.then(([cards, profileData]) => {
+userId = profileData;
+
+cards.forEach(card => {
+  placeList.append(createCard(card, openPopupImage, profileData._id))
+  profileProcessing(profileData)
 })
-
-
-profileEditBtn.addEventListener('click', () => openPopup(popupTypeEdit))
+})
+function profileProcessing(profileData){
+profileTitle.textContent = profileData.name
+profileDesc.textContent = profileData.about
+profileAvatar.src = profileData.avatar
+}
+profileEditBtn.addEventListener('click', () => {
+  openPopup(popupTypeEdit) 
+  editFormNameInput.value = profileTitle.textContent
+  editFormDescInput.value = profileDesc.textContent
+  clearValidation(editForm, validationConfig)
+} )
 profileAddBtn.addEventListener('click', () => openPopup(popupTypeNewCard))
 
 function openPopupImage(name, link) {
-  const popupTypeImage = document.querySelector('.popup_type_image')
-  const popupImage = popupTypeImage.querySelector('.popup__image')
-  const popupCaption = popupTypeImage.querySelector('.popup__caption')
-
   popupImage.src = link
   popupImage.alt = name
-  popupCaption.textContent = name
+  popupCaptionTypeImage.textContent = name
 
   openPopup(popupTypeImage)
 }
@@ -47,16 +70,16 @@ closePopupBtns.forEach(buttons => {
   })
 })
 
-
 function editFormSubmit(event){
   event.preventDefault()
 
   const nameValue = editFormNameInput.value
   const descValue = editFormDescInput.value
 
-  profileTitle.textContent = nameValue
-  profileDesc.textContent = descValue
-
+  editProfileInfo(nameValue,descValue)
+  .then(profileData => {
+    profileProcessing(profileData)
+  })
   closePopup(popupTypeEdit)
 }
 editForm.addEventListener('submit', editFormSubmit)
@@ -67,13 +90,13 @@ function newCardFormSubmit(event){
   const nameValue = newCardNameInput.value
   const urlValue = newCardUrlInput.value
 
-  const card = {
-    name: nameValue,
-    link: urlValue
-  }
- placeList.prepend(createCard(card))
- closePopup(popupTypeNewCard)
- newCardForm.replaceWith()
+ addCard(nameValue, urlValue)
+ .then(card => {
+  placeList.prepend(createCard(card, openPopupImage))
+  closePopup(popupTypeNewCard)
+  newCardForm.reset()
+ })
+ 
 }
 newCardForm.addEventListener('submit', newCardFormSubmit)
 
@@ -85,5 +108,27 @@ document.addEventListener('DOMContentLoaded', () => {
   }) 
 })
 
-
 closePopupByOverlay(popups)
+
+function editAvatar(event){
+  event.preventDefault()
+
+  const urlValue = avatarFormInput.value;
+  updateAvatar(urlValue)
+  .then( profileData => {
+    profileAvatar.src = profileData.avatar;
+    closePopup(popupTypeAvatar)
+  })
+}
+avatarForm.addEventListener('submit', editAvatar)
+profileAvatar.addEventListener('click', () => openPopup(popupTypeAvatar))
+// Включение валидации форм
+const validationConfig = {
+  formSelector: '.popup__form',
+  inputSelector: '.popup__input',
+  submitButtonSelector: '.popup__button',
+  inactiveButtonClass: 'popup__button_disabled',
+  inputErrorClass: 'popup__input_type_error',
+  errorClass: 'popup__error_visible'
+};
+enableValidation(validationConfig)

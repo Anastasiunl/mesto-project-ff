@@ -13,7 +13,7 @@ function closePopupByEscape(event){
     closePopup(document.querySelector('.popup_is-opened'))
   }
 }
-export function closePopupByOverlay() {
+export function closePopupByOverlay(popups) {
   popups.forEach(popup =>{
     popup.addEventListener('click', (event) => {
       if(event.target.classList.contains('popup')){
@@ -22,4 +22,3 @@ export function closePopupByOverlay() {
     })
   })
 }
-
