@@ -60,7 +60,8 @@ const showInputError = (input, errorElement, errorMessage, config) => {
   if (errorElement) {
     errorElement.textContent = errorMessage;
     errorElement.classList.add(config.errorClass);
-    errorElement.classList.add('popup__input-error_visible');
+   // errorElement.classList.add('popup__input-error_visible');
+   errorElement.classList.add(config.errorVisibleClass);
   }
 }
 
@@ -71,7 +72,8 @@ const hideInputError = (input, errorElement, config) => {
   if (errorElement) {
     errorElement.textContent = '';
     errorElement.classList.remove(config.errorClass);
-    errorElement.classList.remove('popup__input-error_visible');
+    errorElement.classList.remove(config.errorVisibleClass)
+    //errorElement.classList.remove('popup__input-error_visible');
   }
 }
 

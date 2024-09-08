@@ -35,12 +35,15 @@ const profileOverlay = document.querySelector('.profile__overlay')
 Promise.all([getInitialCards(), getProfileInfo()])
 .then(([cards, profileData]) => {
 userId = profileData;
-
 cards.forEach(card => {
   placeList.append(createCard(card, openPopupImage, profileData._id))
   profileProcessing(profileData)
 })
 })
+.catch((error) => {
+  console.log(error)
+})
+
 function profileProcessing(profileData){
 profileTitle.textContent = profileData.name
 profileDesc.textContent = profileData.about
@@ -71,33 +74,47 @@ closePopupBtns.forEach(buttons => {
 
 function editFormSubmit(event){
   event.preventDefault()
-
+  const formButton = editForm.querySelector('.popup__button')
   const nameValue = editFormNameInput.value
   const descValue = editFormDescInput.value
+  const initialTextButton = formButton.textContent
+  formButton.textContent = 'Сохранение...'
 
   editProfileInfo(nameValue,descValue)
   .then(profileData => {
     profileProcessing(profileData)
+    closePopup(popupTypeEdit)
   })
-  closePopup(popupTypeEdit)
+  .catch((error) => {
+    console.log(error)
+  })
+  .finally(() => {
+    formButton.textContent = initialTextButton
+  })
 }
 editForm.addEventListener('submit', editFormSubmit)
 
-function newCardFormSubmit(event){
+function submitNewCardForm(event){
   event.preventDefault()
- 
+  const formButton = newCardForm.querySelector('.popup__button')
   const nameValue = newCardNameInput.value
   const urlValue = newCardUrlInput.value
-
+  const initialTextButton = formButton.textContent
+  formButton.textContent = 'Сохранение...'
  addCard(nameValue, urlValue)
  .then(card => {
   placeList.prepend(createCard(card, openPopupImage))
   closePopup(popupTypeNewCard)
   newCardForm.reset()
  })
- 
+ .catch((error) => {
+  console.log(error)
+})
+ .finally(() => {
+  formButton.textContent = initialTextButton
+})
 }
-newCardForm.addEventListener('submit', newCardFormSubmit)
+newCardForm.addEventListener('submit', submitNewCardForm)
 
 document.addEventListener('DOMContentLoaded', () => {
   popups.forEach(popup =>{
@@ -111,12 +128,21 @@ closePopupByOverlay(popups)
 
 function editAvatar(event){
   event.preventDefault()
+  const formButton = avatarForm.querySelector('.popup__button')
+  const initialTextButton = formButton.textContent
+  formButton.textContent = 'Сохранение...'
 
   const urlValue = avatarFormInput.value;
   updateAvatar(urlValue)
   .then( profileData => {
     profileAvatar.src = profileData.avatar;
     closePopup(popupTypeAvatar)
+  })
+  .catch((error) => {
+    console.log(error)
+  })
+   .finally(() => {
+    formButton.textContent = initialTextButton
   })
 }
 avatarForm.addEventListener('submit', editAvatar)
@@ -128,6 +154,7 @@ const validationConfig = {
   submitButtonSelector: '.popup__button',
   inactiveButtonClass: 'popup__button_disabled',
   inputErrorClass: 'popup__input_type_error',
-  errorClass: 'popup__error_visible'
+  errorClass: 'popup__error_visible',
+  errorVisibleClass: 'popup__input-error_visible'
 };
 enableValidation(validationConfig)

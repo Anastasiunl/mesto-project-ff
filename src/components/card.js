@@ -63,5 +63,8 @@ function deleteMyCard(card, cardId) {
   .then( () => {
     card.remove();
   })
+  .catch((error) => {
+    console.log(error)
+  })
 }
 export { createCard, changeLike, deleteMyCard };
