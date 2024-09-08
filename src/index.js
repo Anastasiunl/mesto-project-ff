@@ -26,6 +26,7 @@ const newCardUrlInput = newCardForm.querySelector('.popup__input_type_url')
 const popupTypeImage = document.querySelector('.popup_type_image')
 const popupImage = popupTypeImage.querySelector('.popup__image')
 const popupCaptionTypeImage = popupTypeImage.querySelector('.popup__caption')
+<<<<<<< HEAD
 const profileAvatar = document.querySelector('.profile__image')
 let userId;
 const popupTypeAvatar = document.querySelector('.popup_type_avatar')
@@ -47,11 +48,21 @@ profileTitle.textContent = profileData.name
 profileDesc.textContent = profileData.about
 profileAvatar.src = profileData.avatar
 }
+=======
+
+initialCards.forEach(card => {
+  placeList.prepend(createCard(card, openPopupImage))
+})
+
+>>>>>>> dc23e5daa45092287993d56d00479081a1e72176
 profileEditBtn.addEventListener('click', () => {
   openPopup(popupTypeEdit) 
   editFormNameInput.value = profileTitle.textContent
   editFormDescInput.value = profileDesc.textContent
+<<<<<<< HEAD
   clearValidation(editForm, validationConfig)
+=======
+>>>>>>> dc23e5daa45092287993d56d00479081a1e72176
 } )
 profileAddBtn.addEventListener('click', () => openPopup(popupTypeNewCard))
 
@@ -90,6 +101,7 @@ function newCardFormSubmit(event){
   const nameValue = newCardNameInput.value
   const urlValue = newCardUrlInput.value
 
+<<<<<<< HEAD
  addCard(nameValue, urlValue)
  .then(card => {
   placeList.prepend(createCard(card, openPopupImage))
@@ -97,6 +109,15 @@ function newCardFormSubmit(event){
   newCardForm.reset()
  })
  
+=======
+  const card = {
+    name: nameValue,
+    link: urlValue
+  }
+ placeList.prepend(createCard(card, openPopupImage))
+ closePopup(popupTypeNewCard)
+ newCardForm.reset()
+>>>>>>> dc23e5daa45092287993d56d00479081a1e72176
 }
 newCardForm.addEventListener('submit', newCardFormSubmit)
 
